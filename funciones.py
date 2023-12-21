@@ -9,13 +9,13 @@ from sklearn.neighbors import NearestNeighbors
 ## cargamos los archivos
 
 # Leer el DataFrame df_games desde un archivo CSV
-df_games = pd.read_csv('../DataSets/df_games_id.csv')
+df_games = pd.read_csv('./DataSets/df_games_id.csv')
 # Leer el DataFrame df_user desde un archivo CSV dentro de un archivo ZIP
-with zipfile.ZipFile('../DataSets/df_user_id.zip', 'r') as zipf:
+with zipfile.ZipFile('./DataSets/df_user_id.zip', 'r') as zipf:
     with zipf.open('df_user_id.csv') as csv_file:
         df_user = pd.read_csv(csv_file)
 # Leer el DataFrame df_reviews desde un archivo CSV
-df_reviews = pd.read_csv('../DataSets/df_user_reviews.csv')
+df_reviews = pd.read_csv('./DataSets/df_user_reviews.csv')
 
 ## Año con más horas jugadas por genero ##
 
