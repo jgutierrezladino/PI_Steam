@@ -23,7 +23,7 @@ df_reviews = pd.read_csv('./DataSets/df_user_reviews.csv')
 
 import pandas as pd
 
-def PlayTimeGenre(genre, percentage=0.1):
+def PlayTimeGenre(genre, percentage=0.01):
     # Tomar un 10% de los datos de df_games
     subset_df_games = df_games.sample(frac=percentage, random_state=42)
     # Filtrar juegos por género
@@ -41,7 +41,7 @@ def PlayTimeGenre(genre, percentage=0.1):
 
 ## Usuario con mas horas jugadas por genero. ##
 
-def UserForGenre(genre, percentage=0.1):
+def UserForGenre(genre, percentage=0.01):
     # Tomar un 10% de los datos de df_games
     subset_df_games = df_games.sample(frac=percentage, random_state=42)  # 
     # Filtrar juegos por género
@@ -63,7 +63,7 @@ def UserForGenre(genre, percentage=0.1):
 
 ## Top tres más recomendadas. ##
 
-def UsersRecommend(year, percentage=0.1):
+def UsersRecommend(year, percentage=0.01):
     # Tomar un 10% de los datos de df_games
     subset_df_games = df_games.sample(frac=percentage, random_state=42)
     # Convertir la columna 'release_date' a tipo datatime
@@ -83,7 +83,7 @@ def UsersRecommend(year, percentage=0.1):
 
 ## Top tres menos recomendadas. ##
 
-def UsersNotRecommend(year, percentage=0.1):
+def UsersNotRecommend(year, percentage=0.01):
     # Tomar un 10% de los datos de df_games
     subset_df_games = df_games.sample(frac=percentage, random_state=42)  # Puedes ajustar el valor de random_state según tus necesidades
     # Convertir la columna 'release_date' a tipo datetime
@@ -103,7 +103,7 @@ def UsersNotRecommend(year, percentage=0.1):
 
 ## Analisis de sentimiento por año.
 
-def sentiment_analysis(year, percentage=0.1):
+def sentiment_analysis(year, percentage=0.01):
     # Tomar un 10% de los datos de df_games
     subset_df_games = df_games.sample(frac=percentage, random_state=42)  # Puedes ajustar el valor de random_state según tus necesidades
     # Unir las reseñas con la información de los juegos
@@ -123,7 +123,7 @@ def sentiment_analysis(year, percentage=0.1):
 ### Preprocesamiento de datos: para Machine-Learning
 
 # Tomar un 10% de los datos de df_games
-subset_df_games = df_games.sample(frac=0.1, random_state=42)
+subset_df_games = df_games.sample(frac=0.01, random_state=42)
 
 # Vamos a procesar la columna 'genres' para que sea más fácil de trabajar y eliminar duplicados.
 
