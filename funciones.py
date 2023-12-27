@@ -4,6 +4,7 @@ import pandas as pd
 from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.neighbors import NearestNeighbors
 from sklearn.model_selection import train_test_split
+import numpy as np
 
 
 ## cargamos los archivos
@@ -34,22 +35,26 @@ def PlayTimeGenre(genre):
 ## Usuario con mas horas jugadas por genero. ##
 
 def UserForGenre(genre):
-    # Filtrar juegos por género
-    filtered_games = df_games[df_games['genres'].str.contains(genre, case=False, na=False)]
-    # Unir DataFrames
-    merged_df = pd.merge(df_user, filtered_games, left_on='item_id', right_on='id')
-    # Convertir la columna 'release_date' a formato de fecha y extraer el año
-    merged_df['release_date'] = pd.to_datetime(merged_df['release_date'], errors='coerce')
-    merged_df = merged_df.dropna(subset=['release_date'])  # Eliminar filas con fechas nulas
-    merged_df['release_year'] = merged_df['release_date'].dt.year
-    # Agregar horas de juego por año y usuario
-    grouped_df = merged_df.groupby(['user_id', 'release_year'])['playtime_forever'].sum().reset_index()
-    # Identificar el usuario con más horas jugadas
-    max_user = grouped_df.loc[grouped_df['playtime_forever'].idxmax()]['user_id']
-    # Obtener la lista de acumulación de horas jugadas por año para ese usuario
-    user_hours_by_year = grouped_df[grouped_df['user_id'] == max_user][['release_year', 'playtime_forever']]
-    user_hours_list = [{"Año": int(year), "Horas": hours} for year, hours in user_hours_by_year.values]
-    return {"Usuario con más horas jugadas para Género " + genre: max_user, "Horas jugadas": user_hours_list}
+    try:
+        # Filtrar juegos por género
+        filtered_games = df_games[df_games['genres'].str.contains(genre, case=False, na=False)]
+        # Unir DataFrames
+        merged_df = pd.merge(df_user, filtered_games, left_on='item_id', right_on='id')
+        # Convertir la columna 'release_date' a formato de fecha y extraer el año
+        merged_df['release_date'] = pd.to_datetime(merged_df['release_date'], errors='coerce')
+        merged_df = merged_df.dropna(subset=['release_date'])  # Eliminar filas con fechas nulas
+        merged_df['release_year'] = merged_df['release_date'].dt.year
+        # Agregar horas de juego por año y usuario
+        grouped_df = merged_df.groupby(['user_id', 'release_year'])['playtime_forever'].sum().reset_index()
+        # Identificar el usuario con más horas jugadas
+        max_user = grouped_df.loc[grouped_df['playtime_forever'].idxmax()]['user_id']
+        # Obtener la lista de acumulación de horas jugadas por año para ese usuario
+        user_hours_by_year = grouped_df[grouped_df['user_id'] == max_user]
+        # Crear una lista de diccionarios para cada año y las horas jugadas
+        result = [{"Año": int(year), "Horas": int(hours)} for year, hours in user_hours_by_year[['release_year', 'playtime_forever']].values]
+        return {"Usuario con más horas jugadas para Género " + genre: max_user, "Horas jugadas por año": result}
+    except Exception as e:
+        return {"error": f"Error en la función UserForGenre: {str(e)}"}
 
 ## Top tres más recomendadas. ##
 
@@ -90,19 +95,22 @@ def UsersNotRecommend(year):
 ## Analisis de sentimiento por año.
 
 def sentiment_analysis(year):
-    # Unir las reseñas con la información de los juegos
-    merged_reviews = pd.merge(df_reviews, df_games[['id', 'release_date']], left_on='item_id', right_on='id')
-    # Filtrar las reseñas para el año dado
-    filtered_reviews = merged_reviews[
-        (pd.to_datetime(merged_reviews['release_date'], errors='coerce').dt.year == year)]
-    # Contar la cantidad de registros por categoría de sentimiento
-    sentiment_counts = filtered_reviews['sentiment_analiysis'].value_counts()
-    # Crear el diccionario de resultados
-    result = {
-        'Negative': sentiment_counts.get(0, 0),
-        'Neutral': sentiment_counts.get(1, 0),
-        'Positive': sentiment_counts.get(2, 0)}
-    return result
+    try:
+        # Unir las reseñas con la información de los juegos
+        merged_reviews = pd.merge(df_reviews, df_games[['id', 'release_date']], left_on='item_id', right_on='id')
+        # Filtrar las reseñas para el año dado
+        filtered_reviews = merged_reviews[
+            (pd.to_datetime(merged_reviews['release_date'], errors='coerce').dt.year == year)]
+        # Contar la cantidad de registros por categoría de sentimiento
+        sentiment_counts = filtered_reviews['sentiment_analiysis'].value_counts()
+        # Crear el diccionario de resultados
+        result = {
+            'Negative': int(sentiment_counts.get(0, 0)),
+            'Neutral': int(sentiment_counts.get(1, 0)),
+            'Positive': int(sentiment_counts.get(2, 0))}
+        return result
+    except Exception as e:
+        return {"error": f"Error en la función sentiment_analysis: {str(e)}"}
 
 ### Preprocesamiento de datos para Machine-Learning
 

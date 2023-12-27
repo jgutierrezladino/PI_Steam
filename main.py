@@ -22,7 +22,7 @@ def play_time_genre(genre: str):
 # Ruta para la función UserForGenre
 @app.get('/user_for_genre/{genre}')
 def user_for_genre(genre: str):
-    result = UserForGenre(genre)
+    result = UserForGenre(genre)  
     return {'result': result}
 
 # Ruta para la función UsersRecommend
@@ -40,6 +40,9 @@ def users_not_recommend(year: int):
 # Ruta para la función sentiment_analysis
 @app.get('/sentiment_analysis/{year}')
 def sentiment_analysis_route(year: int):
-    result = sentiment_analysis(year)
-    return {'result': result}
+    try:
+        result = sentiment_analysis(year)  # Solo proporciona un argumento, que es 'year'
+        return {'result': result}
+    except Exception as e:
+        return {'error': f"Error al procesar la solicitud: {str(e)}"}
 
