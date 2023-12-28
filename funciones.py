@@ -5,6 +5,9 @@ from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.neighbors import NearestNeighbors
 from sklearn.model_selection import train_test_split
 import numpy as np
+from sklearn.preprocessing import MultiLabelBinarizer
+from sklearn.impute import SimpleImputer
+import logging
 
 
 ## cargamos los archivos
@@ -113,32 +116,54 @@ def sentiment_analysis(year):
         return {"error": f"Error en la función sentiment_analysis: {str(e)}"}
 
 ### Preprocesamiento de datos para Machine-Learning
+# Manejar datos faltantes y duplicados
+df_games = df_games.dropna()  # Puedes ajustar esto según tus necesidades
+df_games = df_games.drop_duplicates(subset=['id', 'app_name'])
 
-# Crear un DataFrame con la relación entre juegos y géneros
-df_game_genres = pd.DataFrame({'id': df_games['id'], 'genres': df_games['genres'], 'app_name': df_games['app_name']})
+# Codificación one-hot para géneros
+mlb = MultiLabelBinarizer()
+genres_encoded = pd.DataFrame(mlb.fit_transform(df_games['genres'].str.split(',')), columns=mlb.classes_)
 
-# Eliminar duplicados en id y genres
-df_game_genres = df_game_genres.drop_duplicates(subset=['id', 'genres'])
+# Concatenar características al conjunto de datos original
+df_games_encoded = pd.concat([df_games, genres_encoded], axis=1)
 
-# Eliminar duplicados en app_name y genres
-df_game_genres = df_game_genres.drop_duplicates(subset=['app_name', 'genres'])
-
-# Crear la matriz de géneros
-genres_matrix = df_game_genres.pivot(index='app_name', columns='genres', values='id').fillna(0)
-
-# Similitud del coseno entre juegos
-cosine_sim = cosine_similarity(genres_matrix, genres_matrix)
+# Calcular la similitud del coseno
+cosine_sim = cosine_similarity(genres_encoded, genres_encoded)
 
 # División de datos
-X_train, X_test = train_test_split(genres_matrix, test_size=0.2, random_state=42)
+X_train, X_test = train_test_split(df_games_encoded, test_size=0.2, random_state=42)
+
+# Manejar valores faltantes en X_train
+X_train_features = X_train.drop(['id', 'app_name', 'genres', 'release_date'], axis=1)  # Eliminar columnas no necesarias
+
+# Opción 1: Eliminar filas con NaN
+# X_train_features = X_train_features.dropna()
+
+# Opción 2: Imputar valores faltantes
+imputer = SimpleImputer(strategy='mean')
+X_train_features = imputer.fit_transform(X_train_features)
 
 # Entrenamiento del modelo KNN
 knn_model = NearestNeighbors(n_neighbors=5, metric='cosine')
-knn_model.fit(X_train)
+knn_model.fit(X_train_features)
 
 # Función para obtener recomendaciones usando el modelo KNN
-def get_recommendations_knn(game_id, model=knn_model):
-    game_row = genres_matrix.loc[game_id].values.reshape(1, -1)
+def get_recommendations_knn(game_id, model=knn_model, df=df_games_encoded):
+    game_row = df.drop(['id', 'app_name', 'genres', 'release_date'], axis=1).loc[game_id].values.reshape(1, -1)
     _, indices = model.kneighbors(game_row)
-    recommendations = genres_matrix.index[indices[0][1:6]].tolist()
+    recommendations = df['app_name'].iloc[indices[0][1:6]].tolist()
     return recommendations
+
+# Función de recomendación
+def recommend_games(game_name):
+    try:
+        # Verificar si hay alguna fila que coincide con el nombre del juego
+        if df_games[df_games['app_name'] == game_name].empty:
+            return {"error": f"No se encontró ningún juego con el nombre '{game_name}'"}
+        # Obtener el índice del juego
+        idx = df_games[df_games['app_name'] == game_name].index[0]
+        # Obtener las recomendaciones usando el modelo KNN
+        recommended_games = get_recommendations_knn(idx)
+        return {'recomendaciones': list(recommended_games)}
+    except Exception as e:
+        return {"error": f"Error en la función recommend_games: {str(e)}"}
