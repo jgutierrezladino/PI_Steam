@@ -2,9 +2,7 @@
 
 <h1 align='center'> Proyecto Individual N°1</h1>
 
-<h2 align='center'> Machine Learning Operations (MLOps)</h2>
-
-<h2 align='center'>Bruno Zenobio, DATAFT16</h2>
+<h2 align='center'>Jonathan Gutierrez, PART TIME 05</h2>
 
 ---
 
