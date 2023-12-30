@@ -1,8 +1,8 @@
-<p align="center"><img src="https://user-images.githubusercontent.com/67664604/217914153-1eb00e25-ac08-4dfa-aaf8-53c09038f082.png"></p>
-
 <h1 align='center'> Proyecto Individual N°1</h1>
 
-<h2 align='center'>Jonathan Gutierrez, PART TIME 05</h2>
+<p align="center"><img src="https://user-images.githubusercontent.com/67664604/217914153-1eb00e25-ac08-4dfa-aaf8-53c09038f082.png"></p>
+
+<h2 align='center'>Jonathan Gutiérrez, PART-TIME 05</h2>
 
 ---
 
