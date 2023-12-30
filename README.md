@@ -11,7 +11,7 @@
     - [Carpeta con los dataset](./DataSets/)
     - [Proceso de ETL y EDA](./ETL%20y%20EDA/)
     - [API desplegada en Render](https://proyecto-individual-steam.onrender.com/docs)
-    - [Link al video]()
+    - [Link al video](https://photos.app.goo.gl/rthrX64eVBY9Awkf8)
 
 
 
